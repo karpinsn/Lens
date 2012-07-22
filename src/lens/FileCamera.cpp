@@ -10,12 +10,12 @@
 
 lens::FileCamera::FileCamera() : QThread()
 {
-  m_capture = NULL;
+  m_capture = nullptr;
 }
 
 lens::FileCamera::~FileCamera()
 {
-  if(NULL != m_capture)
+  if(nullptr != m_capture)
   {
     cvReleaseCapture(&m_capture);
   }
@@ -23,10 +23,10 @@ lens::FileCamera::~FileCamera()
 
 void lens::FileCamera::init(void)
 {
-  QString file = QFileDialog::getOpenFileName(NULL, "Select a multiwavelength movie to open", "/", "Movies (*.avi)");
+  QString file = QFileDialog::getOpenFileName(nullptr, "Select a multiwavelength movie to open", "/", "Movies (*.avi)");
 
   //	If we dont have a currently selected item then selected the first in the list
-  if (NULL != file && !file.isEmpty())
+  if (nullptr != file && !file.isEmpty())
   {
     m_currentFileName = file.toLocal8Bit().constData();
     m_capture = cvCaptureFromAVI(m_currentFileName.c_str());
@@ -63,10 +63,10 @@ void lens::FileCamera::run()
 {
   while(m_running)
   {
-    if(NULL != m_capture)
+    if(nullptr != m_capture)
     {
       IplImage* image = cvQueryFrame(m_capture);
-      if(NULL != image)
+      if(nullptr != image)
       {
         notifyObservers(image);
       }

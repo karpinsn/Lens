@@ -10,12 +10,12 @@
 
 lens::OpenCVCamera::OpenCVCamera() : QThread()
 {
-  m_capture = NULL;
+  m_capture = nullptr;
 }
 
 lens::OpenCVCamera::~OpenCVCamera()
 {
-  if(NULL != m_capture)
+  if(nullptr != m_capture)
   {
     cvReleaseCapture(&m_capture);
   }
@@ -56,7 +56,7 @@ void lens::OpenCVCamera::run()
 {
   while(m_running)
   {
-    if(NULL != m_capture)
+    if(nullptr != m_capture)
     {
       IplImage* image = cvQueryFrame(m_capture);
       notifyObservers(image);
