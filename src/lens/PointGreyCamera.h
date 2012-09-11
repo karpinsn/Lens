@@ -1,20 +1,20 @@
 /*
- Filename:		JAICamera.h
+ Filename:		PointGreyCamera.h
  Author:		Nikolaus Karpinsky
- Date Created:	09/20/10
- Last Edited:	09/20/10
+ Date Created:	09/11/12
+ Last Edited:	09/11/12
  
  Revision Log:
- 09/20/10 - Nik Karpinsky - Original creation.
+ 09/11/12 - Nik Karpinsky - Original creation.
  */
 
-#ifndef _JAI_CAMERA_H_
-#define _JAI_CAMERA_H_
-#define USE_JAI_CAMERA
+#ifndef _POINT_GREY_CAMERA_H_
+#define _POINT_GREY_CAMERA_H_
+#define USE_POINT_GREY_CAMERA
 
+#include <QThread>
+#include <FlyCapture2.h>
 #include "Camera.h"
-#include <Jai_Factory.h>
-//#include <stdint.h>
 
 #define NODE_NAME_WIDTH         "Width"
 #define NODE_NAME_HEIGHT        "Height"
@@ -25,33 +25,30 @@ using namespace std;
 
 namespace lens
 {
-    class JAICamera : public Camera
+    class PointGreyCamera : public Camera, QThread
 	{
 	private:
-		FACTORY_HANDLE	m_factory; // Factory Handle
-		CAM_HANDLE		m_camera; // Camera Handle
-		THRD_HANDLE     m_thread;      // Acquisition Thread Handle
-		int8_t          m_cameraID[J_CAMERA_ID_SIZE];    // Camera ID string
-		IplImage*		m_cameraImage;
+		FlyCapture2::Camera			m_camera; // Camera Handle
+		FlyCapture2::PGRGuid		m_cameraGUID; // Camera GUID
+		FlyCapture2::BusManager		m_busManager;
+		bool						m_running;
+		FlyCapture2::Image			m_rawImage;
+		IplImage*					m_convertedImage;
+		
 
     public:
-	  JAICamera(void);
-      virtual void init(void);
-      virtual void open(void);
-      virtual void close(void);
-	  virtual float getWidth(void);
-      virtual float getHeight(void);
+		PointGreyCamera(void);
+		virtual void init(void);
+		virtual void open(void);
+		virtual void close(void);
+		virtual float getWidth(void);
+		virtual float getHeight(void);
 
-      static std::string cameraName(void);
-	  void streamCallBack(J_tIMAGE_INFO * pAqImageInfo);
+		static std::string cameraName(void);
 
-	private:
-		void _openFactory(void);
-		void _openCamera(void);
-
-		void _closeFactory(void);
-		void _closeCamera(void);
+	protected:
+		void run();
 	};
 }
 
-#endif	// _JAI_CAMERA_H_
+#endif	// _POINT_GREY_CAMERA_H_

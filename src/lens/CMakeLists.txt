@@ -72,10 +72,21 @@ option(LENS_POINT_GREY_CAMERA "Build with PointGrey Camera" OFF)
 if(LENS_POINT_GREY_CAMERA)
 	set(USE_POINT_GREY_CAMERA ON)
 	message(STATUS "Building with PointGrey Camera Functionality")
-	LIST(APPEND SOURCES
-		PointGreyCamera.cpp
-		PointGreyCamera.h
-	)
+	
+	find_package(PointGrey REQUIRED)
+	if(POINTGREY_FOUND)
+		include_directories(${POINTGREY_INCLUDE_DIR})
+		LIST(APPEND LIBS ${POINTGREY_LIBRARIES})
+		
+		SET(LENS_INCLUDE_DIRS ${LENS_INCLUDE_DIRS} ${POINTGREY_INCLUDE_DIR})
+		SET(LENS_LIBRARIES ${LENS_LIBRARIES} ${POINTGREY_LIBRARIES})
+		
+		LIST(APPEND SOURCES
+			PointGreyCamera.cpp
+			PointGreyCamera.h
+		)
+	endif(POINTGREY_FOUND)
+	
 else()
 	SET(USE_POINT_GREY_CAMERA OFF)
 endif()
