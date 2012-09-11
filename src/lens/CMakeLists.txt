@@ -65,6 +65,21 @@ else()
 	SET(USE_IC_CAMERA OFF)
 endif()
 
+#	-----------------------------------------------
+#	Allow the option to compile with PointGrey Camera
+#	-----------------------------------------------
+option(LENS_POINT_GREY_CAMERA "Build with PointGrey Camera" OFF)
+if(LENS_POINT_GREY_CAMERA)
+	set(USE_POINT_GREY_CAMERA ON)
+	message(STATUS "Building with PointGrey Camera Functionality")
+	LIST(APPEND SOURCES
+		PointGreyCamera.cpp
+		PointGreyCamera.h
+	)
+else()
+	SET(USE_POINT_GREY_CAMERA OFF)
+endif()
+
 #	----------------------------------------------
 #	Allow the option to compute with Phantom Camera
 #	----------------------------------------------
