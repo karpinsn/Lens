@@ -7,6 +7,10 @@
 
 #include "Camera.h"
 
+lens::Camera::~Camera()
+{
+
+}
 
 void lens::Camera::addObserver(CameraObserver *observer)
 {
