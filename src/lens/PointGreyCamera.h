@@ -28,13 +28,15 @@ namespace lens
     class PointGreyCamera : public Camera, QThread
 	{
 	private:
-		FlyCapture2::Camera			m_camera; // Camera Handle
-		FlyCapture2::PGRGuid		m_cameraGUID; // Camera GUID
-		FlyCapture2::BusManager		m_busManager;
-		bool						m_running;
-		FlyCapture2::Image			m_rawImage;
-		IplImage*					m_convertedImage;
-		
+		//	Constants used by PointGrey to specify registers and
+		//	needed values on their camera
+	  	const unsigned int c_cameraPower;
+		const unsigned int c_cameraPowerValue;
+
+		FlyCapture2::Camera				m_camera; // Camera Handle
+		FlyCapture2::PGRGuid			m_cameraGUID; // Camera GUID
+		FlyCapture2::BusManager			m_busManager; // Bus manager for all cameras
+		bool							m_running;	  // Thread stuff	
 
     public:
 		PointGreyCamera(void);
@@ -48,6 +50,25 @@ namespace lens
 
 	protected:
 		void run();
+
+	private:
+	  /**
+	  *	Sets the trigger on the camera to be an external trigger.
+	  * Before calling this function the camera must be connected
+	  * and powered up: i.e. init() should have been called and open()
+	  * should have been called. This maybe called from open()
+	  */
+	  void _setExternalTrigger(void);
+
+	  /**
+	  * Checks the passed in error to see if it is an error. If it
+	  *	is an error then it will log the error and return false.
+	  * If there is no error then it will just return true.
+	  *
+	  *	@params error - Error to be checking / logging
+	  *	@returns True or false whether or not there was an error
+	  */
+	  bool _checkLogError(FlyCapture2::Error error);
 	};
 }
 
