@@ -59,6 +59,7 @@ void lens::PointGreyCamera::open(void)
 
 	m_thread = new QThread(this);
 	PointGreyCameraWorker* worker = new PointGreyCameraWorker(*this);
+	worker->moveToThread(m_thread);
 
 	connect(m_thread, SIGNAL(started()), worker, SLOT(getFrame()));
 	connect(worker, SIGNAL(finished()), m_thread, SLOT(quit()));
