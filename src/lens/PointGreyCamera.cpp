@@ -82,12 +82,26 @@ void lens::PointGreyCamera::close(void)
 
 float lens::PointGreyCamera::getWidth(void)
 {
-	return 800.0f;
+  FlyCapture2::Format7ImageSettings cameraImageSettings;
+  unsigned int packetSize = 0;
+  float packetPercentage = 0;
+
+  if(!_checkLogError(m_camera.GetFormat7Configuration(&cameraImageSettings, &packetSize, &packetPercentage)))
+	return 0.0f;
+
+  return cameraImageSettings.width;
 }
 
 float lens::PointGreyCamera::getHeight(void)
 {
-	return 600.0f;
+  FlyCapture2::Format7ImageSettings cameraImageSettings;
+  unsigned int packetSize = 0;
+  float packetPercentage = 0;
+
+  if(!_checkLogError(m_camera.GetFormat7Configuration(&cameraImageSettings, &packetSize, &packetPercentage)))
+	return 0.0f;
+
+  return cameraImageSettings.height;
 }
 
 std::string lens::PointGreyCamera::cameraName(void)
