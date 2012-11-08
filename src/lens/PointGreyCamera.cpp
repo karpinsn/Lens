@@ -82,12 +82,12 @@ void lens::PointGreyCamera::close(void)
 
 float lens::PointGreyCamera::getWidth(void)
 {
-	return 1280.0f;
+	return 800.0f;
 }
 
 float lens::PointGreyCamera::getHeight(void)
 {
-	return 1024.0f;
+	return 600.0f;
 }
 
 std::string lens::PointGreyCamera::cameraName(void)
@@ -116,6 +116,8 @@ void lens::PointGreyCameraWorker::getFrame(void)
 	  error = rawImage.Convert(FlyCapture2::PIXEL_FORMAT_RGB, &converterImage);
 	  m_parent.notifyObservers(convertedImage.get());
   }
+
+  emit finished();
 }
 
 void lens::PointGreyCameraWorker::stop()

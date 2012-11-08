@@ -40,6 +40,9 @@ namespace lens
 
 	  public slots:
 		void getFrame(void);
+
+	  signals:
+		void finished(void);
 	};
 
     class PointGreyCamera : public QObject, public Camera
