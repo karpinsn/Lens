@@ -27,13 +27,13 @@ void lens::PointGreyCamera::init(void)
 
 	if(!_checkLogError(m_busManager.GetCameraFromIndex(0, &m_cameraGUID)))
 	  return;
+
+	if(!_checkLogError(m_camera.Connect(&m_cameraGUID)))
+	  return;
 }
 
 void lens::PointGreyCamera::open(void)
-{
-	if(!_checkLogError(m_camera.Connect(&m_cameraGUID)))
-	  return;
-	
+{	
 	FlyCapture2::CameraInfo camInfo;
 	if(!_checkLogError(m_camera.GetCameraInfo(&camInfo)))
 	  return;
