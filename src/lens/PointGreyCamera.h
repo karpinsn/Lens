@@ -25,8 +25,28 @@ using namespace std;
 
 namespace lens
 {
-    class PointGreyCamera : public Camera, QThread
+	class PointGreyCamera;
+	class PointGreyCameraWorker : public QObject
 	{
+	  Q_OBJECT
+	  private:
+		PointGreyCamera& m_parent;
+		bool m_running;
+
+	  public:
+		PointGreyCameraWorker(PointGreyCamera& camera) : 
+			m_parent(camera), m_running(true) { };
+		void stop(void);
+
+	  public slots:
+		void getFrame(void);
+	};
+
+    class PointGreyCamera : public QObject, public Camera
+	{
+	  Q_OBJECT
+	  friend class PointGreyCameraWorker;
+
 	private:
 		//	Constants used by PointGrey to specify registers and
 		//	needed values on their camera
@@ -38,6 +58,8 @@ namespace lens
 		FlyCapture2::BusManager			m_busManager; // Bus manager for all cameras
 		bool							m_running;	  // Thread stuff	
 
+		QThread* m_thread;
+
     public:
 		PointGreyCamera(void);
 		virtual void init(void);
@@ -47,9 +69,6 @@ namespace lens
 		virtual float getHeight(void);
 
 		static std::string cameraName(void);
-
-	protected:
-		void run();
 
 	private:
 	  /**

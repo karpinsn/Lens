@@ -23,6 +23,11 @@ set(SOURCES
 	FileCamera.h
 )
 
+set(LENS_MOCS
+	Camera.h
+	FileCamera.h
+)
+
 #	-----------------------------------------------
 #	Allow the option to compile with JAI Camera
 #	-----------------------------------------------
@@ -85,6 +90,11 @@ if(LENS_POINT_GREY_CAMERA)
 			PointGreyCamera.cpp
 			PointGreyCamera.h
 		)
+		
+		LIST(APPEND LENS_MOCS
+			PointGreyCamera.h
+		)
+		
 	endif(POINTGREY_FOUND)
 	
 else()
@@ -137,6 +147,12 @@ if(LENS_GENERATE_DOC)
 	add_subdirectory(../../doc ${PROJECT_BINARY_DIR}/doc)
 endif(LENS_GENERATE_DOC)
 
+#   ---------------------------------------------------------------------------------------
+#	Qt Generation
+#	---------------------------------------------------------------------------------------
+qt4_wrap_cpp(GENERATED_SOURCES ${LENS_MOCS})
+source_group("Generated Sources - Do Not Edit" FILES ${GENERATED_SOURCES})
+
 #	---------------------------------------------------------------------------------------
 #	Build the library
 #	---------------------------------------------------------------------------------------
@@ -144,5 +160,5 @@ endif(LENS_GENERATE_DOC)
 set(LENS_INCLUDE_DIRS ${LENS_INCLUDE_DIRS} PARENT_SCOPE)
 set(LENS_LIBRARIES ${LENS_LIBRARIES} PARENT_SCOPE)
 
-add_library(${NAME} ${SOURCES})
+add_library(${NAME} ${SOURCES} ${GENERATED_SOURCES} ${LENS_MOCS})
 
