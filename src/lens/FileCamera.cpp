@@ -42,7 +42,7 @@ void lens::FileCamera::open(void)
   m_worker->moveToThread(m_thread);
 
   //  Finally start up the thread
-  m_thread->start();
+  m_thread->start(QThread::TimeCriticalPriority);
 }
 
 void lens::FileCamera::close(void)

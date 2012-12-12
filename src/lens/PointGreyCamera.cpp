@@ -66,7 +66,7 @@ void lens::PointGreyCamera::open(void)
 	connect(m_thread, SIGNAL(finished()), m_thread, SLOT(deleteLater()));
 	connect(worker, SIGNAL(finished()), worker, SLOT(deleteLater()));
 
-	m_thread->start();
+	m_thread->start(QThread::TimeCriticalPriority);
 }
 
 void lens::PointGreyCamera::close(void)

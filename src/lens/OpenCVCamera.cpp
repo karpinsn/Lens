@@ -29,7 +29,7 @@ void lens::OpenCVCamera::init(void)
 void lens::OpenCVCamera::open(void)
 {
   m_running = true;
-  this->start();
+  this->start(QThread::TimeCriticalPriority);
 }
 
 void lens::OpenCVCamera::close(void)

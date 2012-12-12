@@ -42,7 +42,7 @@ void lens::PhantomCamera::init(void)
 void lens::PhantomCamera::open(void)
 {
   m_running = true;
-  this->start();
+  this->start(QThread::TimeCriticalPriority);
 }
 
 void lens::PhantomCamera::close(void)
