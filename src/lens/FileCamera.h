@@ -8,6 +8,8 @@ Last Edited:	09/20/10
 #ifndef _FILE_CAMERA_H_
 #define _FILE_CAMERA_H_
 
+#define USE_FILE_CAMERA
+
 #include <QThread>
 #include <qtimer.h>
 #include <QFileDialog>
@@ -32,10 +34,10 @@ namespace lens
   class FileCameraWorker : public QObject
   {
 	Q_OBJECT
-    private:
+	private:
 	  FileCamera& m_parent;
 
-    public:
+	public:
 	  FileCameraWorker(FileCamera& camera) : m_parent(camera) { };
 
 	public slots:

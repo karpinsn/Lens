@@ -14,19 +14,35 @@ set(NAME lens)
 set(SOURCES
 	Camera.cpp
 	CameraObserver.cpp
-	OpenCVCamera.cpp
-	FileCamera.cpp
+	OpenCVCamera.cpp	
 
 	Camera.h
 	CameraObserver.h
-	OpenCVCamera.h
-	FileCamera.h
+	OpenCVCamera.h	
 )
 
 set(LENS_MOCS
 	Camera.h
-	FileCamera.h
 )
+
+#	-----------------------------------------------
+#	Allow the option to compile with JAI Camera
+#	-----------------------------------------------
+option(LENS_FILE_CAMERA "Build with QT4 File Camera" OFF)
+if(LENS_FILE_CAMERA)
+	SET(USE_FILE_CAMERA ON)
+	message(STATUS "Building with QT4 File Camera Functionality")	
+
+	LIST(APPEND LENS_MOCS
+		FileCamera.h)
+
+	LIST(APPEND SOURCES
+		FileCamera.cpp
+		FileCamera.h)
+
+else()
+	SET(USE_JAI_CAMERA OFF)
+endif()
 
 #	-----------------------------------------------
 #	Allow the option to compile with JAI Camera
@@ -102,7 +118,7 @@ else()
 endif()
 
 #	----------------------------------------------
-#	Allow the option to compute with Phantom Camera
+#	Allow the option to compile with Phantom Camera
 #	----------------------------------------------
 option(LENS_PHANTOM_CAMERA "Build with Phantom Camera" OFF)
 if(LENS_PHANTOM_CAMERA)

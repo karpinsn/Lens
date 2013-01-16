@@ -5,6 +5,7 @@
  *	Author:	Nik Karpinsky & CMake
  */
 
+#cmakedefine USE_FILE_CAMERA
 #cmakedefine USE_IC_CAMERA
 #cmakedefine USE_JAI_CAMERA
 #cmakedefine USE_POINT_GREY_CAMERA
