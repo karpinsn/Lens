@@ -17,7 +17,7 @@ lens::OpenCVCamera::~OpenCVCamera()
 {
   if(nullptr != m_capture)
   {
-    cvReleaseCapture(&m_capture);
+	cvReleaseCapture(&m_capture);
   }
 }
 
@@ -39,12 +39,23 @@ void lens::OpenCVCamera::close(void)
 
 float lens::OpenCVCamera::getWidth(void)
 {
-  return cvGetCaptureProperty(m_capture, CV_CAP_PROP_FRAME_WIDTH);
+  int width = cvGetCaptureProperty(m_capture, CV_CAP_PROP_FRAME_WIDTH);
+  //  OpenCV has problems with direct show and getting properties. 
+  //  Return a hardcoded value if it can't find one
+  return width > 0 ? width : 640;
 }
 
 float lens::OpenCVCamera::getHeight(void)
 {
-  return cvGetCaptureProperty(m_capture, CV_CAP_PROP_FRAME_HEIGHT);
+  int height = cvGetCaptureProperty(m_capture, CV_CAP_PROP_FRAME_HEIGHT);
+  //  OpenCV has problems with direct show and getting properties. 
+  //  Return a hardcoded value if it can't find one
+  return height > 0 ? height : 480;
+}
+
+IplImage* lens::OpenCVCamera::getFrame(void)
+{
+  return m_capture != nullptr ? cvQueryFrame(m_capture) : nullptr;
 }
 
 std::string lens::OpenCVCamera::cameraName(void)
@@ -56,10 +67,10 @@ void lens::OpenCVCamera::run()
 {
   while(m_running)
   {
-    if(nullptr != m_capture)
-    {
-      IplImage* image = cvQueryFrame(m_capture);
-      notifyObservers(image);
-    }
+	if(nullptr != m_capture)
+	{
+	  IplImage* image = cvQueryFrame(m_capture);
+	  notifyObservers(image);
+	}
   }
 }

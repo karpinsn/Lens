@@ -21,25 +21,26 @@ using namespace std;
 
 namespace lens
 {
-    class OpenCVCamera : public Camera, QThread
+	class OpenCVCamera : public Camera, QThread
 	{
-    private:
-      CvCapture   *m_capture;
-      bool        m_running;
-    public:
-      OpenCVCamera();
-      ~OpenCVCamera();
+	private:
+	  CvCapture   *m_capture;
+	  bool        m_running;
+	public:
+	  OpenCVCamera();
+	  ~OpenCVCamera();
 
-      virtual void  init(void);
-      virtual void  open(void);
-      virtual void  close(void);
-      virtual float getWidth(void);
-      virtual float getHeight(void);
+	  virtual void		init(void);
+	  virtual void		open(void);
+	  virtual void		close(void);
+	  virtual float		getWidth(void);
+	  virtual float		getHeight(void);
+	  virtual IplImage* getFrame(void);
 
-      static std::string cameraName(void);
+	  static std::string cameraName(void);
 
-    protected:
-      void run();
+	protected:
+	  void run();
 	};
 }
 
