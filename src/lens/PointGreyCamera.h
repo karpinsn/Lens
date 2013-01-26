@@ -63,6 +63,9 @@ namespace lens
 
 		QThread* m_thread;
 
+		shared_ptr<IplImage>			m_convertedImage;
+		shared_ptr<FlyCapture2::Image>  m_converterImage;
+
     public:
 		PointGreyCamera(void);
 		virtual void init(void);
@@ -70,6 +73,7 @@ namespace lens
 		virtual void close(void);
 		virtual float getWidth(void);
 		virtual float getHeight(void);
+		virtual IplImage* getFrame(void);
 
 		static std::string cameraName(void);
 

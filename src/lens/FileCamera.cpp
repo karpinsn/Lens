@@ -29,7 +29,7 @@ void lens::FileCamera::open(void)
   //  Create the thread and its timer
   m_thread = new QThread(this);
   m_timer = new QTimer(0);
-  m_timer->setInterval(1000/540);
+  m_timer->setInterval(1000/180);
 
   //  Connect the thread and its timer 
   connect(m_thread, SIGNAL(started()), m_timer, SLOT(start()));
@@ -74,6 +74,23 @@ float lens::FileCamera::getHeight(void)
 std::string lens::FileCamera::cameraName(void)
 {
   return "File Based Camera Driver";
+}
+
+IplImage* lens::FileCamera::getFrame(void)
+{
+  while(nullptr != m_capture)
+  {
+	IplImage* image = cvQueryFrame(m_capture.get());
+    if(nullptr != image)
+    {
+      return image;
+    }
+    else
+    {
+	  // Create a new capture from the same file (loop the file)
+      m_capture = shared_ptr<CvCapture>(cvCaptureFromAVI(m_currentFileName.c_str()), [](CvCapture* ptr){ cvReleaseCapture(&ptr); });
+    }
+  }
 }
 
 void lens::FileCameraWorker::getFrame()

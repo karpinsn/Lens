@@ -66,7 +66,15 @@ void lens::PointGreyCamera::open(void)
 	connect(m_thread, SIGNAL(finished()), m_thread, SLOT(deleteLater()));
 	connect(worker, SIGNAL(finished()), worker, SLOT(deleteLater()));
 
-	m_thread->start(QThread::TimeCriticalPriority);
+	//m_thread->start(QThread::TimeCriticalPriority); //TODO comeback and fix
+
+	m_convertedImage = shared_ptr<IplImage>(
+	  cvCreateImage(cvSize(getWidth(), getHeight()), IPL_DEPTH_8U, 3),
+	  [](IplImage* ptr) { cvReleaseImage(&ptr); });
+
+	FlyCapture2::Image m_converterImage(
+	  reinterpret_cast<unsigned char*>(m_convertedImage->imageData), 
+	  m_convertedImage->imageSize);
 }
 
 void lens::PointGreyCamera::close(void)
@@ -107,6 +115,15 @@ float lens::PointGreyCamera::getHeight(void)
 std::string lens::PointGreyCamera::cameraName(void)
 {
 	return "Point Grey Camera Driver";
+}
+
+IplImage* lens::PointGreyCamera::getFrame(void)
+{
+  FlyCapture2::Image rawImage;
+  m_camera.RetrieveBuffer(&rawImage);
+  rawImage.Convert(FlyCapture2::PIXEL_FORMAT_RGB, m_converterImage.get());
+
+  return m_convertedImage.get();
 }
 
 void lens::PointGreyCameraWorker::getFrame(void)

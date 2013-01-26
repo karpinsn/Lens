@@ -74,6 +74,7 @@ namespace lens
 	virtual void  close(void);
 	virtual float getWidth(void);
 	virtual float getHeight(void);
+	virtual IplImage* getFrame(void);
 
 	static std::string cameraName(void);
   };
