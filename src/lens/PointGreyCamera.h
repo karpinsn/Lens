@@ -63,8 +63,9 @@ namespace lens
 
 		QThread* m_thread;
 
-		shared_ptr<IplImage>			m_convertedImage;
+		shared_ptr<FlyCapture2::Image>	m_rawImage;
 		shared_ptr<FlyCapture2::Image>  m_converterImage;
+		shared_ptr<IplImage>			m_convertedImage;
 
     public:
 		PointGreyCamera(void);

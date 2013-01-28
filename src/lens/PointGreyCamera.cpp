@@ -68,11 +68,13 @@ void lens::PointGreyCamera::open(void)
 
 	//m_thread->start(QThread::TimeCriticalPriority); //TODO comeback and fix
 
+	m_rawImage = make_shared<FlyCapture2::Image>();
+
 	m_convertedImage = shared_ptr<IplImage>(
 	  cvCreateImage(cvSize(getWidth(), getHeight()), IPL_DEPTH_8U, 3),
 	  [](IplImage* ptr) { cvReleaseImage(&ptr); });
 
-	FlyCapture2::Image m_converterImage(
+	m_converterImage = make_shared<FlyCapture2::Image>(
 	  reinterpret_cast<unsigned char*>(m_convertedImage->imageData), 
 	  m_convertedImage->imageSize);
 }
@@ -119,9 +121,8 @@ std::string lens::PointGreyCamera::cameraName(void)
 
 IplImage* lens::PointGreyCamera::getFrame(void)
 {
-  FlyCapture2::Image rawImage;
-  m_camera.RetrieveBuffer(&rawImage);
-  rawImage.Convert(FlyCapture2::PIXEL_FORMAT_RGB, m_converterImage.get());
+  m_camera.RetrieveBuffer(m_rawImage.get());
+  m_rawImage->Convert(FlyCapture2::PIXEL_FORMAT_RGB, m_converterImage.get());
 
   return m_convertedImage.get();
 }
