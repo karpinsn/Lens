@@ -175,6 +175,22 @@ void lens::PointGreyCamera::_setExternalTrigger(void)
 	  return;
 }
 
+void lens::PointGreyCamera::_setGrabMode(void)
+{
+    FlyCapture2::Error error;
+
+    // Setup buffer grab mode
+    FlyCapture2::FC2Config config;
+
+    if(!_checkLogError(m_camera.GetConfiguration(&config)));
+      return;
+
+    config.grabMode = BUFFER_FRAMES;
+    
+    if(!_checkLogError(m_camera.SetConfiguration(&config)));
+      return;
+}
+
 bool lens::PointGreyCamera::_checkLogError(FlyCapture2::Error error)
 {
   if (error != FlyCapture2::PGRERROR_OK)
