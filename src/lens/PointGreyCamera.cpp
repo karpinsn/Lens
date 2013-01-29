@@ -186,7 +186,8 @@ void lens::PointGreyCamera::_setGrabMode(void)
       return;
 
     config.grabMode = BUFFER_FRAMES;
-    
+    config.grabTimeout = 0; // Never timeout
+
     if(!_checkLogError(m_camera.SetConfiguration(&config)));
       return;
 }

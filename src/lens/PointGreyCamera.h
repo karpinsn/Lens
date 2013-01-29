@@ -87,7 +87,16 @@ namespace lens
 	  */
 	  void _setExternalTrigger(void);
 
-	  /**
+      /**
+       * Sets the grab mode on the camera to buffer frames
+       * so that we dont drop any (hopefully). Before calling
+       * this function the camera must be connected and powered up: i.e.
+       * init() should have been called and open() should have been called
+       * This is probably called from open()
+       */
+      void lens::PointGreyCamera::_setGrabMode(void)
+	  
+      /**
 	  * Checks the passed in error to see if it is an error. If it
 	  *	is an error then it will log the error and return false.
 	  * If there is no error then it will just return true.
