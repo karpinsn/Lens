@@ -94,7 +94,7 @@ namespace lens
        * init() should have been called and open() should have been called
        * This is probably called from open()
        */
-      void lens::PointGreyCamera::_setGrabMode(void)
+      void lens::PointGreyCamera::_setGrabMode(void);
 	  
       /**
 	  * Checks the passed in error to see if it is an error. If it

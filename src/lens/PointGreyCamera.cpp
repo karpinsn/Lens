@@ -53,6 +53,7 @@ void lens::PointGreyCamera::open(void)
 
 
 	_setExternalTrigger();
+	_setGrabMode();
 
 	if(!_checkLogError(m_camera.StartCapture()))
 	  return;
@@ -182,13 +183,14 @@ void lens::PointGreyCamera::_setGrabMode(void)
     // Setup buffer grab mode
     FlyCapture2::FC2Config config;
 
-    if(!_checkLogError(m_camera.GetConfiguration(&config)));
+    if(!_checkLogError(m_camera.GetConfiguration(&config)))
       return;
 
-    config.grabMode = BUFFER_FRAMES;
-    config.grabTimeout = 0; // Never timeout
+	config.grabMode = FlyCapture2::BUFFER_FRAMES;
+	config.grabTimeout = FlyCapture2::TIMEOUT_INFINITE;
+	config.numBuffers = 10; // TODO: Not sure if I have to allocate for these
 
-    if(!_checkLogError(m_camera.SetConfiguration(&config)));
+    if(!_checkLogError(m_camera.SetConfiguration(&config)))
       return;
 }
 
