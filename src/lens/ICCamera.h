@@ -12,23 +12,28 @@
 #define _IC_CAMERA_H_
 
 #define USE_IC_CAMERA
-#include "Camera.h"
+#include "ICamera.h"
 
 using namespace std;
 
 namespace lens
 {
-    class ICCamera : public Camera
+    class ICCamera : public ICamera
 	{
+	  Q_OBJECT
+
     private:
       //DShowLib::Grabber        m_grabber; // The instance of the Grabber class.
 
     public:
-      virtual void init(void);
-      virtual void open(void);
-      virtual void close(void);
-      static std::string cameraName(void);
+	  static std::string cameraName(void);
 
+	public slots:
+	  bool		open(void);
+	  bool		close(void);
+	  int		getWidth(void);
+	  int		getHeight(void);
+	  IplImage* getFrame(void);
 	};
 }
 

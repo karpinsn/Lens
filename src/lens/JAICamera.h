@@ -12,9 +12,8 @@
 #define _JAI_CAMERA_H_
 #define USE_JAI_CAMERA
 
-#include "Camera.h"
+#include "ICamera.h"
 #include <Jai_Factory.h>
-//#include <stdint.h>
 
 #define NODE_NAME_WIDTH         "Width"
 #define NODE_NAME_HEIGHT        "Height"
@@ -25,8 +24,10 @@ using namespace std;
 
 namespace lens
 {
-    class JAICamera : public Camera
+    class JAICamera : public ICamera
 	{
+	  Q_OBJECT
+
 	private:
 		FACTORY_HANDLE	m_factory; // Factory Handle
 		CAM_HANDLE		m_camera; // Camera Handle
@@ -36,21 +37,17 @@ namespace lens
 
     public:
 	  JAICamera(void);
-      virtual void init(void);
-      virtual void open(void);
-      virtual void close(void);
-	  virtual float getWidth(void);
-      virtual float getHeight(void);
-
-      static std::string cameraName(void);
+	  static std::string cameraName(void);
 	  void streamCallBack(J_tIMAGE_INFO * pAqImageInfo);
 
-	private:
-		void _openFactory(void);
-		void _openCamera(void);
+	public slots:
+	  bool open(void);
+      bool close(void);
+	  int getWidth(void);
+      int getHeight(void);
 
-		void _closeFactory(void);
-		void _closeCamera(void);
+	private:
+	  bool _checkSuccess(J_STATUS_TYPE status);
 	};
 }
 

@@ -8,19 +8,29 @@
 
 #include "ICCamera.h"
 
-void lens::ICCamera::init(void)
+bool lens::ICCamera::open(void)
 {
-
+  return false;
 }
 
-void lens::ICCamera::open(void)
+bool lens::ICCamera::close(void)
 {
-
+  return false;
 }
 
-void lens::ICCamera::close(void)
+int lens::ICCamera::getWidth(void)
 {
+  return 0;
+}
 
+int lens::ICCamera::getHeight(void)
+{
+  return 0;
+}
+
+IplImage* lens::ICCamera::getFrame(void)
+{
+  return nullptr;
 }
 
 std::string lens::ICCamera::cameraName(void)

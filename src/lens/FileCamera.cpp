@@ -8,11 +8,9 @@
 #include "FileCamera.h"
 
 lens::FileCamera::FileCamera()
-{
-  m_worker = shared_ptr<FileCameraWorker>(new FileCameraWorker(*this));
-}
+{ }
 
-void lens::FileCamera::init(void)
+bool lens::FileCamera::open(void)
 {
   QString file = QFileDialog::getOpenFileName(nullptr, "Select a movie to open", "/", "Movies (*.avi)");
 
@@ -22,53 +20,29 @@ void lens::FileCamera::init(void)
     m_currentFileName = file.toLocal8Bit().constData();
 	m_capture = shared_ptr<CvCapture>(cvCaptureFromAVI(m_currentFileName.c_str()), [](CvCapture* ptr){ cvReleaseCapture(&ptr); });
   }
+
+  return nullptr != m_capture;
 }
 
-void lens::FileCamera::open(void)
+bool lens::FileCamera::close(void)
 {
-  //  Create the thread and its timer
-  m_thread = new QThread(this);
-  m_timer = new QTimer(0);
-  m_timer->setInterval(1000/180);
-
-  //  Connect the thread and its timer 
-  connect(m_thread, SIGNAL(started()), m_timer, SLOT(start()));
-  connect(m_thread, SIGNAL(finished()), m_thread, SLOT(deleteLater()));
-  connect(m_thread, SIGNAL(finished()), m_timer, SLOT(stop()));
-  connect(m_timer, SIGNAL(timeout()), m_worker.get(), SLOT(getFrame()));
-
-  //  Move ourselves and the timer to the newly created thread
-  m_timer->moveToThread(m_thread);
-  m_worker->moveToThread(m_thread);
-
-  //  Finally start up the thread
-  m_thread->start(QThread::TimeCriticalPriority);
+  return true;
 }
 
-void lens::FileCamera::close(void)
+int lens::FileCamera::getWidth(void)
 {
-  m_thread->quit();
-  m_thread->wait();
+  if(nullptr == m_capture)
+	{ return 0; }
+	
+  return cvGetCaptureProperty(m_capture.get(), CV_CAP_PROP_FRAME_WIDTH);
 }
 
-float lens::FileCamera::getWidth(void)
+int lens::FileCamera::getHeight(void)
 {
-  if(nullptr != m_capture)
-  {
-	return cvGetCaptureProperty(m_capture.get(), CV_CAP_PROP_FRAME_WIDTH);
-  }
+  if(nullptr == m_capture)
+	{ return 0; }
 
-  return 0.0f;
-}
-
-float lens::FileCamera::getHeight(void)
-{
-  if(nullptr != m_capture)
-  {
-	return cvGetCaptureProperty(m_capture.get(), CV_CAP_PROP_FRAME_HEIGHT);
-  }
-
-  return 0.0f;
+  return cvGetCaptureProperty(m_capture.get(), CV_CAP_PROP_FRAME_HEIGHT);
 }
 
 std::string lens::FileCamera::cameraName(void)
@@ -78,34 +52,15 @@ std::string lens::FileCamera::cameraName(void)
 
 IplImage* lens::FileCamera::getFrame(void)
 {
-  while(nullptr != m_capture)
-  {
-	IplImage* image = cvQueryFrame(m_capture.get());
-    if(nullptr != image)
-    {
-      return image;
-    }
-    else
-    {
-	  // Create a new capture from the same file (loop the file)
-      m_capture = shared_ptr<CvCapture>(cvCaptureFromAVI(m_currentFileName.c_str()), [](CvCapture* ptr){ cvReleaseCapture(&ptr); });
-    }
-  }
-}
+  if( nullptr == m_capture )
+	{ return nullptr; }
+  
+  IplImage* image = cvQueryFrame(m_capture.get());
+  if(nullptr != image)
+	{ return image; }
 
-void lens::FileCameraWorker::getFrame()
-{
-  if(nullptr != m_parent.m_capture)
-  {
-	IplImage* image = cvQueryFrame(m_parent.m_capture.get());
-    if(nullptr != image)
-    {
-      m_parent.notifyObservers(image);
-    }
-    else
-    {
-	  // Create a new capture from the same file (loop the file)
-      m_parent.m_capture = shared_ptr<CvCapture>(cvCaptureFromAVI(m_parent.m_currentFileName.c_str()), [](CvCapture* ptr){ cvReleaseCapture(&ptr); });
-    }
-  }
+  // If here, we have hit the end of the file. Reloop and send the image
+  // Create a new capture from the same file (loop the file)
+  m_capture = shared_ptr<CvCapture>(cvCaptureFromAVI(m_currentFileName.c_str()), [](CvCapture* ptr){ cvReleaseCapture(&ptr); });
+  return cvQueryFrame(m_capture.get());
 }

@@ -12,17 +12,18 @@ set(NAME lens)
 #	---------------------------------------------------------------------------------------
 
 set(SOURCES
-	Camera.cpp
-	CameraObserver.cpp
+    FrameGrabber.cpp
 	OpenCVCamera.cpp	
 
-	Camera.h
-	CameraObserver.h
+    ICamera.h
+    FrameGrabber.h
 	OpenCVCamera.h	
 )
 
 set(LENS_MOCS
-	Camera.h
+    FrameGrabber.h
+    OpenCVCamera.h
+    ICamera.h
 )
 
 #	-----------------------------------------------
@@ -62,6 +63,9 @@ if(LENS_JAI_CAMERA)
 		SET(LENS_INCLUDE_DIRS ${LENS_INCLUDE_DIRS} ${JAI_INCLUDE_DIR})
 		SET(LENS_LIBRARIES ${LENS_LIBRARIES} ${JAI_LIBRARIES})
 
+        LIST(APPEND LENS_MOCS
+            JAICamera.h)
+
 		LIST(APPEND SOURCES
 			JAICamera.cpp
 			JAICamera.h
@@ -78,7 +82,11 @@ option(LENS_IC_CAMERA "Build with IC_CAMERA" OFF)
 if(LENS_IC_CAMERA)
 	SET(USE_IC_CAMERA ON)
 	message(STATUS "Building with IC Camera Functionality")
-	LIST(APPEND SOURCES
+	
+    LIST(APPEND LENS_MOCS
+        ICCamera.h)
+    
+    LIST(APPEND SOURCES
 		ICCamera.cpp
 		ICCamera.h
 	)
@@ -133,6 +141,9 @@ if(LENS_PHANTOM_CAMERA)
 
 		SET(LENS_INCLUDE_DIRS ${LENS_INCLUDE_DIRS} ${PHANTOM_INCLUDE_DIR})
 		SET(LENS_LIBRARIES ${LENS_LIBRARIES} ${PHANTOM_LIBRARIES})
+
+        LIST(APPEND LENS_MOCS 
+            PhantomCamera.h)
 
 		LIST(APPEND SOURCES
 			PhantomCamera.cpp

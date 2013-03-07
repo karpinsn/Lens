@@ -1,11 +1,8 @@
-/*
- Filename:		OpenCVCamera.h
- Author:		Nikolaus Karpinsky
- Date Created:	09/20/10
- Last Edited:	09/20/10
- 
- Revision Log:
- 09/20/10 - Nik Karpinsky - Original creation.
+/**
+  @filename
+  @author	  Nikolaus Karpinsky
+  Date Created:	09/20/10
+  Last Edited:	09/20/10
  */
 
 #ifndef _OPEN_CV_CAMERA_H_
@@ -13,34 +10,30 @@
 
 #include <cv.h>
 #include <highgui.h>
-#include <QThread>
 
-#include "Camera.h"
+#include "ICamera.h"
 
 using namespace std;
 
 namespace lens
 {
-	class OpenCVCamera : public Camera, QThread
+	class OpenCVCamera : public ICamera
 	{
+	  Q_OBJECT
+
 	private:
-	  CvCapture   *m_capture;
-	  bool        m_running;
+	  shared_ptr<CvCapture> m_capture;
+
 	public:
 	  OpenCVCamera();
-	  ~OpenCVCamera();
-
-	  virtual void		init(void);
-	  virtual void		open(void);
-	  virtual void		close(void);
-	  virtual float		getWidth(void);
-	  virtual float		getHeight(void);
-	  virtual IplImage* getFrame(void);
-
 	  static std::string cameraName(void);
 
-	protected:
-	  void run();
+	public slots:
+	  bool		open(void);
+	  bool		close(void);
+	  int		getWidth(void);
+	  int		getHeight(void);
+	  IplImage* getFrame(void);
 	};
 }
 

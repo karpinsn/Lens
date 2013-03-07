@@ -13,41 +13,35 @@ lens::PointGreyCamera::PointGreyCamera(void) :
   c_cameraPower(0x610), c_cameraPowerValue(0x80000000)
 { }
 
-void lens::PointGreyCamera::init(void)
+bool lens::PointGreyCamera::open(void)
 {	
 	unsigned int numCameras;
 	if(!_checkLogError(m_busManager.GetNumOfCameras(&numCameras)))
-		return; //	Could not get the number of attached cameras
+		return false;	// Could not get the number of attached cameras
 
 	if(numCameras < 1)
-	{
-		//	No Point Grey cameras detected. 
-		return;
-	}
+	  { return false; } //	No Point Grey cameras detected. 
 
 	if(!_checkLogError(m_busManager.GetCameraFromIndex(0, &m_cameraGUID)))
-	  return;
+	  { return false; }
 
 	if(!_checkLogError(m_camera.Connect(&m_cameraGUID)))
-	  return;
-}
+	  { return false; }
 
-void lens::PointGreyCamera::open(void)
-{	
 	FlyCapture2::CameraInfo camInfo;
 	if(!_checkLogError(m_camera.GetCameraInfo(&camInfo)))
-	  return;
+	  { return false; }
 
 	// Power on the camera
 	if(!_checkLogError(m_camera.WriteRegister( c_cameraPower, c_cameraPowerValue )))
-	  return;
+	  { return false; }
 	
 	//	Wait for the camera to power up
 	unsigned int currentPowerValue = 0;
 	do
 	{
 	  if(!_checkLogError(m_camera.ReadRegister(c_cameraPower, &currentPowerValue)))
-		return;
+		{ return false; }
 
 	} while ((currentPowerValue & c_cameraPowerValue) == 0);
 
@@ -56,18 +50,7 @@ void lens::PointGreyCamera::open(void)
 	_setGrabMode();
 
 	if(!_checkLogError(m_camera.StartCapture()))
-	  return;
-
-	m_thread = new QThread(this);
-	PointGreyCameraWorker* worker = new PointGreyCameraWorker(*this);
-	worker->moveToThread(m_thread);
-
-	connect(m_thread, SIGNAL(started()), worker, SLOT(getFrame()));
-	connect(worker, SIGNAL(finished()), m_thread, SLOT(quit()));
-	connect(m_thread, SIGNAL(finished()), m_thread, SLOT(deleteLater()));
-	connect(worker, SIGNAL(finished()), worker, SLOT(deleteLater()));
-
-	//m_thread->start(QThread::TimeCriticalPriority); //TODO comeback and fix
+	  { return false; }
 
 	m_rawImage = make_shared<FlyCapture2::Image>();
 
@@ -80,37 +63,37 @@ void lens::PointGreyCamera::open(void)
 	  m_convertedImage->imageSize);
 }
 
-void lens::PointGreyCamera::close(void)
+bool lens::PointGreyCamera::close(void)
 {
-	m_running = false;
-	
 	if(!_checkLogError(m_camera.StopCapture()))
-	  return; //	Failed to stop the camera
+	  { return false; } //	Failed to stop the camera
 
 	if(!_checkLogError(m_camera.Disconnect()))
-	  return; // Failed to disconnect from the camera
+	  { return false; } // Failed to disconnect from the camera
+
+	return true;
 }
 
-float lens::PointGreyCamera::getWidth(void)
+int lens::PointGreyCamera::getWidth(void)
 {
   FlyCapture2::Format7ImageSettings cameraImageSettings;
   unsigned int packetSize = 0;
   float packetPercentage = 0;
 
   if(!_checkLogError(m_camera.GetFormat7Configuration(&cameraImageSettings, &packetSize, &packetPercentage)))
-	return 0.0f;
+	{ return 0; }
 
   return cameraImageSettings.width;
 }
 
-float lens::PointGreyCamera::getHeight(void)
+int lens::PointGreyCamera::getHeight(void)
 {
   FlyCapture2::Format7ImageSettings cameraImageSettings;
   unsigned int packetSize = 0;
   float packetPercentage = 0;
 
   if(!_checkLogError(m_camera.GetFormat7Configuration(&cameraImageSettings, &packetSize, &packetPercentage)))
-	return 0.0f;
+	{ return 0; }
 
   return cameraImageSettings.height;
 }
@@ -128,36 +111,6 @@ IplImage* lens::PointGreyCamera::getFrame(void)
   return m_convertedImage.get();
 }
 
-void lens::PointGreyCameraWorker::getFrame(void)
-{
-  //  Used for grabbing the image from the camera
-  FlyCapture2::Image rawImage;
-
-  //  Used to convert image to an IplImage for our observers
-  shared_ptr<IplImage> convertedImage(
-	cvCreateImage(cvSize(m_parent.getWidth(), m_parent.getHeight()), IPL_DEPTH_8U, 3),
-	[](IplImage* ptr) { cvReleaseImage(&ptr); });
-
-  FlyCapture2::Image converterImage(
-	reinterpret_cast<unsigned char*>(convertedImage->imageData), 
-	convertedImage->imageSize);
-
-  FlyCapture2::Error error;
-  while(m_running)
-  {
-	  error = m_parent.m_camera.RetrieveBuffer(&rawImage);
-	  error = rawImage.Convert(FlyCapture2::PIXEL_FORMAT_RGB, &converterImage);
-	  m_parent.notifyObservers(convertedImage.get());
-  }
-
-  emit finished();
-}
-
-void lens::PointGreyCameraWorker::stop()
-{
-  m_running = false;
-}
-
 void lens::PointGreyCamera::_setExternalTrigger(void)
 {
 	FlyCapture2::Error error;
@@ -165,7 +118,7 @@ void lens::PointGreyCamera::_setExternalTrigger(void)
 	FlyCapture2::TriggerMode triggerMode;
 
 	if(!_checkLogError(m_camera.GetTriggerMode(&triggerMode)))
-	  return;
+	  { return; }
 	
 	triggerMode.onOff = true;
 	triggerMode.mode = 0;
@@ -173,7 +126,7 @@ void lens::PointGreyCamera::_setExternalTrigger(void)
 	triggerMode.source = 0;
 
 	if(!_checkLogError(m_camera.SetTriggerMode(&triggerMode)))
-	  return;
+	  { return; }
 }
 
 void lens::PointGreyCamera::_setGrabMode(void)
@@ -184,23 +137,21 @@ void lens::PointGreyCamera::_setGrabMode(void)
     FlyCapture2::FC2Config config;
 
     if(!_checkLogError(m_camera.GetConfiguration(&config)))
-      return;
+	  { return; }
 
-	config.grabMode = FlyCapture2::BUFFER_FRAMES;
-	config.grabTimeout = FlyCapture2::TIMEOUT_INFINITE;
-	config.numBuffers = 10; // TODO: Not sure if I have to allocate for these
+	config.grabMode		= FlyCapture2::BUFFER_FRAMES;
+	config.grabTimeout	= FlyCapture2::TIMEOUT_INFINITE;
+	config.numBuffers	= 10; // TODO: Not sure if I have to allocate for these
 
     if(!_checkLogError(m_camera.SetConfiguration(&config)))
-      return;
+	  { return; }
 }
 
 bool lens::PointGreyCamera::_checkLogError(FlyCapture2::Error error)
 {
   if (error != FlyCapture2::PGRERROR_OK)
-  {
-	// Log our error and return false
-	return false;
-  }
+	{ return false; } // Log our error and return false
+
   //  No error, return true
   return true;
 }

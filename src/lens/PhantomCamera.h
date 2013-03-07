@@ -15,19 +15,19 @@
 
 #include <iostream>
 #include <phcon.h>			//	Phantom camera includes
-#include <QThread>			//	Qt Includes
 
-#include "Camera.h"
+#include "ICamera.h"
 
 using namespace std;
 
 namespace lens
 {
-    class PhantomCamera : public Camera, QThread
+    class PhantomCamera : public ICamera
 	{
+	Q_OBJECT
+	
 	private:
 		IplImage*		m_cameraImage;
-        bool            m_running;
 
         unsigned int    m_cameraNumber;
 
@@ -42,26 +42,18 @@ namespace lens
       PhantomCamera(void);
 	  ~PhantomCamera();
 
-      virtual void init(void);
-      virtual void open(void);
-      virtual void close(void);
-	  virtual float getWidth(void);
-      virtual float getHeight(void);
-
-	  void setFrameRate(int fps);
-	  void setTrigger(unsigned int triggerMode);
-
       static std::string cameraName(void);
 
-    protected:
-      void run();
-
-	private:
-		void _openFactory(void);
-		void _openCamera(void);
-
-		void _closeFactory(void);
-		void _closeCamera(void);
+	public slots:
+	  bool 	open(void);
+      bool 	close(void);
+	  int 	getWidth(void);
+      int	getHeight(void);
+	  IplImage* getFrame(void);
+	  
+	  // Phantom specific slots
+	  void setFrameRate(int fps);
+	  void setTrigger(unsigned int triggerMode);
 	};
 }
 
