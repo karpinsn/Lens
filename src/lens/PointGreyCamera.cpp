@@ -45,10 +45,6 @@ bool lens::PointGreyCamera::open(void)
 
 	} while ((currentPowerValue & c_cameraPowerValue) == 0);
 
-
-	_setExternalTrigger();
-	_setGrabMode();
-
 	if(!_checkLogError(m_camera.StartCapture()))
 	  { return false; }
 
@@ -61,6 +57,8 @@ bool lens::PointGreyCamera::open(void)
 	m_converterImage = make_shared<FlyCapture2::Image>(
 	  reinterpret_cast<unsigned char*>(m_convertedImage->imageData), 
 	  m_convertedImage->imageSize);
+
+	return true;
 }
 
 bool lens::PointGreyCamera::close(void)
@@ -111,7 +109,7 @@ IplImage* lens::PointGreyCamera::getFrame(void)
   return m_convertedImage.get();
 }
 
-void lens::PointGreyCamera::_setExternalTrigger(void)
+void lens::PointGreyCamera::setExternalTrigger(void)
 {
 	FlyCapture2::Error error;
 	//	Setup external trigger
@@ -129,7 +127,7 @@ void lens::PointGreyCamera::_setExternalTrigger(void)
 	  { return; }
 }
 
-void lens::PointGreyCamera::_setGrabMode(void)
+void lens::PointGreyCamera::setBufferedGrab(int buffers)
 {
     FlyCapture2::Error error;
 
@@ -141,7 +139,7 @@ void lens::PointGreyCamera::_setGrabMode(void)
 
 	config.grabMode		= FlyCapture2::BUFFER_FRAMES;
 	config.grabTimeout	= FlyCapture2::TIMEOUT_INFINITE;
-	config.numBuffers	= 10; // TODO: Not sure if I have to allocate for these
+	config.numBuffers	= buffers;
 
     if(!_checkLogError(m_camera.SetConfiguration(&config)))
 	  { return; }
