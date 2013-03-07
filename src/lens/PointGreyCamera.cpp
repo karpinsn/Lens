@@ -150,7 +150,7 @@ bool lens::PointGreyCamera::setFormat7(int width, int height, int offsetX, int o
   settings.height = height;
   settings.offsetX = offsetX;
   settings.offsetY = offsetY;
-  settings.pixelFormat = FlyCapture2::PIXEL_FORMAT_MONO8;
+	settings.pixelFormat = FlyCapture2::PIXEL_FORMAT_RAW8;
 
   bool valid;
   FlyCapture2::Format7PacketInfo packetInfo;
@@ -162,9 +162,18 @@ bool lens::PointGreyCamera::setFormat7(int width, int height, int offsetX, int o
   if(!valid)
 	{ return false; }
 
+	// Have to stop the capture before we can set this 
+	// configuration since we are changing the image size
+	if(!_checkLogError(m_camera.StopCapture()))
+		{ return false; }
+
   if(!_checkLogError(m_camera.SetFormat7Configuration(
 	&settings, packetInfo.recommendedBytesPerPacket)))
 	{ return false; }
+
+	// Dont forget to start the capture again
+	if(!_checkLogError(m_camera.StartCapture()))
+		{ return false; }
 
   return true;
 }
@@ -172,6 +181,7 @@ bool lens::PointGreyCamera::setFormat7(int width, int height, int offsetX, int o
 bool lens::PointGreyCamera::setGain(float gain)
 {
   FlyCapture2::Property gainProperty;
+	gainProperty.type = FlyCapture2::GAIN;
   if(!_checkLogError(m_camera.GetProperty(&gainProperty)))
 	{ return false; }
 
