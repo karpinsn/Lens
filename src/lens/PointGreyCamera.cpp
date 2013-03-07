@@ -111,7 +111,6 @@ IplImage* lens::PointGreyCamera::getFrame(void)
 
 void lens::PointGreyCamera::setExternalTrigger(void)
 {
-	FlyCapture2::Error error;
 	//	Setup external trigger
 	FlyCapture2::TriggerMode triggerMode;
 
@@ -129,8 +128,6 @@ void lens::PointGreyCamera::setExternalTrigger(void)
 
 void lens::PointGreyCamera::setBufferedGrab(int buffers)
 {
-    FlyCapture2::Error error;
-
     // Setup buffer grab mode
     FlyCapture2::FC2Config config;
 
@@ -143,6 +140,46 @@ void lens::PointGreyCamera::setBufferedGrab(int buffers)
 
     if(!_checkLogError(m_camera.SetConfiguration(&config)))
 	  { return; }
+}
+
+bool lens::PointGreyCamera::setFormat7(int width, int height, int offsetX, int offsetY)
+{
+  FlyCapture2::Format7ImageSettings settings;
+  settings.mode = FlyCapture2::MODE_0;
+  settings.width = width;
+  settings.height = height;
+  settings.offsetX = offsetX;
+  settings.offsetY = offsetY;
+  settings.pixelFormat = FlyCapture2::PIXEL_FORMAT_MONO8;
+
+  bool valid;
+  FlyCapture2::Format7PacketInfo packetInfo;
+
+  if(!_checkLogError(m_camera.ValidateFormat7Settings(
+	&settings, &valid, &packetInfo)))
+	{ return false; }
+
+  if(!valid)
+	{ return false; }
+
+  if(!_checkLogError(m_camera.SetFormat7Configuration(
+	&settings, packetInfo.recommendedBytesPerPacket)))
+	{ return false; }
+
+  return true;
+}
+
+bool lens::PointGreyCamera::setGain(float gain)
+{
+  FlyCapture2::Property gainProperty;
+  if(!_checkLogError(m_camera.GetProperty(&gainProperty)))
+	{ return false; }
+
+  gainProperty.absValue = gain;
+  if(!_checkLogError(m_camera.SetProperty(&gainProperty)))
+  { return false; }
+
+  return true;
 }
 
 bool lens::PointGreyCamera::_checkLogError(FlyCapture2::Error error)

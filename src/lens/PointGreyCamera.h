@@ -69,6 +69,18 @@ namespace lens
 	*/
 	void setBufferedGrab(int buffers);
 
+   /**
+	* Sets the format of the camera to use Format7, which is a custom
+	* sized output format. Specifying the width, height, and offsets will
+	* determine where the images is grabbed from the CCD.
+	*/
+	bool setFormat7(int width, int height, int offsetX, int offsetY);
+
+   /**
+	* Sets the gain to the specified value.
+	*/
+	bool setGain(float gain);
+
   private:
    /**
 	* Checks the passed in error to see if it is an error. If it
