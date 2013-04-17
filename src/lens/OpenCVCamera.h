@@ -8,6 +8,7 @@
 #ifndef _OPEN_CV_CAMERA_H_
 #define _OPEN_CV_CAMERA_H_
 
+#include <memory>
 #include <cv.h>
 #include <highgui.h>
 
