@@ -12,6 +12,8 @@ Revision Log:
 #define _POINT_GREY_CAMERA_H_
 #define USE_POINT_GREY_CAMERA
 
+#include <memory>
+
 #include <QThread>
 #include <FlyCapture2.h>
 #include "ICamera.h"
