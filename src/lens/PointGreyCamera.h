@@ -45,6 +45,9 @@ namespace lens
 	shared_ptr<FlyCapture2::Image>  m_converterImage;
 	shared_ptr<IplImage>			m_convertedImage;
 
+	unsigned int m_previousFrameNumber;
+	unsigned int m_frameSetCount;
+
   public:
 	PointGreyCamera(void);
 	static string cameraName(void);
@@ -82,6 +85,13 @@ namespace lens
 	* Sets the gain to the specified value.
 	*/
 	bool setGain(float gain);
+
+   /**
+	* Sets the frame set count, which is the number of frames belonging to a set. 
+	* If a frame has to be dropped due to processing, it will drop the number of frames
+	* in a set, so that correct ordering can be maintained.
+	*/
+	bool setFrameSetCount( unsigned int frameSetCount );
 
   private:
    /**

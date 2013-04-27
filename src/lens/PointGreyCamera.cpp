@@ -10,7 +10,7 @@
 
 lens::PointGreyCamera::PointGreyCamera(void) :
   //  Magic numbers from the point grey camera library
-  c_cameraPower(0x610), c_cameraPowerValue(0x80000000)
+  c_cameraPower(0x610), c_cameraPowerValue(0x80000000), m_frameSetCount(1), m_previousFrameNumber(0)
 { }
 
 bool lens::PointGreyCamera::open(void)
@@ -44,6 +44,12 @@ bool lens::PointGreyCamera::open(void)
 		{ return false; }
 
 	} while ((currentPowerValue & c_cameraPowerValue) == 0);
+
+	// Set the frame counter on so that we can check what frame we are on
+	FlyCapture2::EmbeddedImageInfo imageInfo;
+	imageInfo.frameCounter.onOff = true;
+	if(!_checkLogError(m_camera.SetEmbeddedImageInfo(&imageInfo)))
+	  { return false;	}
 
 	if(!_checkLogError(m_camera.StartCapture()))
 	  { return false; }
@@ -104,8 +110,21 @@ std::string lens::PointGreyCamera::cameraName(void)
 IplImage* lens::PointGreyCamera::getFrame(void)
 {
   m_camera.RetrieveBuffer(m_rawImage.get());
-  m_rawImage->Convert(FlyCapture2::PIXEL_FORMAT_RGB, m_converterImage.get());
 
+  // Make sure that we haven't dropped an image.
+  unsigned int currentFrameNumber = m_rawImage->GetMetadata().embeddedFrameCounter;
+  // So long as the difference is not an entire set, drop frames
+  while( (currentFrameNumber - ( m_previousFrameNumber + 1 ) ) % m_frameSetCount )
+  {
+	cout << "Need to drop a Frame!" << " " << (currentFrameNumber - (m_previousFrameNumber + 1) ) % m_frameSetCount << " " << m_previousFrameNumber << " " << currentFrameNumber << endl;
+	m_camera.RetrieveBuffer(m_rawImage.get());
+	currentFrameNumber = m_rawImage->GetMetadata().embeddedFrameCounter;
+  }
+
+  m_previousFrameNumber = currentFrameNumber;
+
+  // Convert and return!
+  m_rawImage->Convert(FlyCapture2::PIXEL_FORMAT_RGB, m_converterImage.get());
   return m_convertedImage.get();
 }
 
@@ -190,6 +209,14 @@ bool lens::PointGreyCamera::setGain(float gain)
   { return false; }
 
   return true;
+}
+
+bool lens::PointGreyCamera::setFrameSetCount( unsigned int frameSetCount )
+{
+  if(frameSetCount < 1)
+	{ return false;	}
+
+  m_frameSetCount = frameSetCount;
 }
 
 bool lens::PointGreyCamera::_checkLogError(FlyCapture2::Error error)
