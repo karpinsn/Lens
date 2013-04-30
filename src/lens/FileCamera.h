@@ -10,6 +10,8 @@ Last Edited:	09/20/10
 
 #define USE_FILE_CAMERA
 
+#include <memory>
+
 #include <qtimer.h>
 #include <QFileDialog>
 

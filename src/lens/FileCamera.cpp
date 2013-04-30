@@ -12,7 +12,7 @@ lens::FileCamera::FileCamera()
 
 bool lens::FileCamera::open(void)
 {
-  QString file = QFileDialog::getOpenFileName(nullptr, "Select a movie to open", "/", "Movies (*.avi)");
+  QString file = QFileDialog::getOpenFileName(nullptr, "Select a movie to open", "/", "Movie (*.avi *.mp4)");
 
   //	If we dont have a currently selected item then selected the first in the list
   if (nullptr != file && !file.isEmpty())
