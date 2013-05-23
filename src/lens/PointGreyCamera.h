@@ -45,11 +45,13 @@ namespace lens
 	shared_ptr<FlyCapture2::Image>  m_converterImage;
 	shared_ptr<IplImage>			m_convertedImage;
 
+	unsigned int m_serialNumber;		// No serial number is represented as 0
 	unsigned int m_previousFrameNumber;
 	unsigned int m_frameSetCount;
 
   public:
-	PointGreyCamera(void);
+	PointGreyCamera(const unsigned int serialNumber = 0);
+
 	static string cameraName(void);
 
   public slots:
@@ -58,6 +60,13 @@ namespace lens
 	int		  getWidth(void);
 	int		  getHeight(void);
 	IplImage* getFrame(void);
+
+   /**
+	* Sets the serial number of the camera to use. This function must be called
+	* before connecting and powering up the camera: i.e. open() as it is used
+	* to specify which camera should be loaded
+	*/
+	void setSerialNumber(const unsigned int serialNumber);
 
    /**
 	* Sets the trigger on the camera to be an external trigger.
