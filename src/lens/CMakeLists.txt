@@ -17,7 +17,6 @@ set(LENS_LIBRARIES ${LENS_LIBRARIES} ${OpenCV_LIBS})
 #	---------------------------------------------------------------------------------------
 
 set(SOURCES
-    FrameGrabber.cpp
 	OpenCVCamera.cpp	
 
     ICamera.h
@@ -26,7 +25,6 @@ set(SOURCES
 )
 
 set(LENS_MOCS
-    FrameGrabber.h
     OpenCVCamera.h
     ICamera.h
 )
