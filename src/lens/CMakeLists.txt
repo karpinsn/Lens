@@ -7,6 +7,11 @@
 
 set(NAME lens) 
 
+# Make sure we have our dependencies
+find_package(OpenCV REQUIRED)
+include_directories(${OpenCV_INCLUDE_DIRS})
+set(LENS_LIBRARIES ${LENS_LIBRARIES} ${OpenCV_LIBS})
+
 #	---------------------------------------------------------------------------------------
 #	List all of the sources to be compiled
 #	---------------------------------------------------------------------------------------
@@ -192,7 +197,9 @@ endif(LENS_GENERATE_DOC)
 #   ---------------------------------------------------------------------------------------
 #	Qt Generation
 #	---------------------------------------------------------------------------------------
-qt4_wrap_cpp(GENERATED_SOURCES ${LENS_MOCS})
+if(QT4_FOUND)
+    qt4_wrap_cpp(GENERATED_SOURCES ${LENS_MOCS})
+endif()
 source_group("Generated Sources - Do Not Edit" FILES ${GENERATED_SOURCES})
 
 #	---------------------------------------------------------------------------------------
