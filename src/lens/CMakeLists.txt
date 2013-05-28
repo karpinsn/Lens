@@ -26,6 +26,21 @@ set(LENS_MOCS
     ICamera.h
 )
 
+option(LENS_SOFTWARE_FRAMEGRABBER "Build with the software framegrabber" OFF)
+if(LENS_SOFTWARE_FRAMEGRABBER)
+    SET(USE_SOFTWARE_FRAMEGRABBER ON)
+    message(STATUS "Building with software framegrabber functionality")
+
+    LIST(APPEND LENS_MOCS
+        FrameGrabber.h)
+
+    LIST(APPEND SOURCES
+        FrameGrabber.cpp
+        FrameGrabber.h)
+else()
+    set(USE_SOFTWARE_FRAMEGRABBER OFF)
+endif()
+
 #	-----------------------------------------------
 #	Allow the option to compile with JAI Camera
 #	-----------------------------------------------
