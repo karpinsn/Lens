@@ -7,16 +7,12 @@
 
 set(NAME lens) 
 
-# Make sure we have our dependencies
-find_package(OpenCV REQUIRED)
-include_directories(${OpenCV_INCLUDE_DIRS})
-set(LENS_LIBRARIES ${LENS_LIBRARIES} ${OpenCV_LIBS})
-
 #	---------------------------------------------------------------------------------------
 #	List all of the sources to be compiled
 #	---------------------------------------------------------------------------------------
 
 set(SOURCES
+    FrameGrabber.cpp
 	OpenCVCamera.cpp	
 
     ICamera.h
@@ -25,24 +21,10 @@ set(SOURCES
 )
 
 set(LENS_MOCS
+    FrameGrabber.h
     OpenCVCamera.h
     ICamera.h
 )
-
-option(LENS_SOFTWARE_FRAMEGRABBER "Build with the software framegrabber" OFF)
-if(LENS_SOFTWARE_FRAMEGRABBER)
-    SET(USE_SOFTWARE_FRAMEGRABBER ON)
-    message(STATUS "Building with software framegrabber functionality")
-
-    LIST(APPEND LENS_MOCS
-        FrameGrabber.h)
-
-    LIST(APPEND SOURCES
-        FrameGrabber.cpp
-        FrameGrabber.h)
-else()
-    set(USE_SOFTWARE_FRAMEGRABBER OFF)
-endif()
 
 #	-----------------------------------------------
 #	Allow the option to compile with JAI Camera
@@ -195,9 +177,7 @@ endif(LENS_GENERATE_DOC)
 #   ---------------------------------------------------------------------------------------
 #	Qt Generation
 #	---------------------------------------------------------------------------------------
-if(QT4_FOUND)
-    qt4_wrap_cpp(GENERATED_SOURCES ${LENS_MOCS})
-endif()
+qt4_wrap_cpp(GENERATED_SOURCES ${LENS_MOCS})
 source_group("Generated Sources - Do Not Edit" FILES ${GENERATED_SOURCES})
 
 #	---------------------------------------------------------------------------------------

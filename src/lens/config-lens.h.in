@@ -5,7 +5,6 @@
  *	Author:	Nik Karpinsky & CMake
  */
 
-#cmakedefine USE_SOFTWARE_FRAMEGRABBER
 #cmakedefine USE_FILE_CAMERA
 #cmakedefine USE_IC_CAMERA
 #cmakedefine USE_JAI_CAMERA
