@@ -8,8 +8,9 @@
 
 #include "PointGreyCamera.h"
 
-lens::PointGreyCamera::PointGreyCamera(unsigned int serialNumber) :
-  c_cameraPower(0x610), c_cameraPowerValue(0x80000000), m_frameSetCount(1), m_previousFrameNumber(0), m_serialNumber(serialNumber)
+lens::PointGreyCamera::PointGreyCamera(void) :
+  //  Magic numbers from the point grey camera library
+  c_cameraPower(0x610), c_cameraPowerValue(0x80000000), m_frameSetCount(1), m_previousFrameNumber(0)
 { }
 
 bool lens::PointGreyCamera::open(void)
@@ -21,18 +22,9 @@ bool lens::PointGreyCamera::open(void)
 	if(numCameras < 1)
 	  { return false; } //	No Point Grey cameras detected. 
 
-	// If we have a serial number (not equal to 0) then use the serial number, else just grab the first one
-	if(m_serialNumber != 0)
-	{
-	  if(!_checkLogError(m_busManager.GetCameraFromSerialNumber(m_serialNumber, &m_cameraGUID)))
-		{ return false; }
-	}
-	else
-	{
-	  if(!_checkLogError(m_busManager.GetCameraFromIndex(0, &m_cameraGUID)))
-		{ return false; }
-	}
-	
+	if(!_checkLogError(m_busManager.GetCameraFromIndex(0, &m_cameraGUID)))
+	  { return false; }
+
 	if(!_checkLogError(m_camera.Connect(&m_cameraGUID)))
 	  { return false; }
 
@@ -136,11 +128,6 @@ IplImage* lens::PointGreyCamera::getFrame(void)
   return m_convertedImage.get();
 }
 
-void lens::PointGreyCamera::setSerialNumber(const unsigned int serialNumber)
-{
-  m_serialNumber = serialNumber;
-}
-
 void lens::PointGreyCamera::setExternalTrigger(void)
 {
 	//	Setup external trigger
@@ -187,7 +174,8 @@ bool lens::PointGreyCamera::setFormat7(int width, int height, int offsetX, int o
   bool valid;
   FlyCapture2::Format7PacketInfo packetInfo;
 
-  if(!_checkLogError(m_camera.ValidateFormat7Settings(&settings, &valid, &packetInfo)))
+  if(!_checkLogError(m_camera.ValidateFormat7Settings(
+	&settings, &valid, &packetInfo)))
 	{ return false; }
 
   if(!valid)
@@ -213,7 +201,6 @@ bool lens::PointGreyCamera::setGain(float gain)
 {
   FlyCapture2::Property gainProperty;
 	gainProperty.type = FlyCapture2::GAIN;
-
   if(!_checkLogError(m_camera.GetProperty(&gainProperty)))
 	{ return false; }
 
@@ -230,7 +217,6 @@ bool lens::PointGreyCamera::setFrameSetCount( unsigned int frameSetCount )
 	{ return false;	}
 
   m_frameSetCount = frameSetCount;
-  return true;
 }
 
 bool lens::PointGreyCamera::_checkLogError(FlyCapture2::Error error)
