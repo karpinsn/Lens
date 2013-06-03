@@ -14,7 +14,6 @@ Revision Log:
 
 #include <memory>
 
-#include <QThread>
 #include <FlyCapture2.h>
 #include "ICamera.h"
 
