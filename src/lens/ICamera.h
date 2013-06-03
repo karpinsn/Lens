@@ -18,6 +18,7 @@ Revision Log:
 #include <highgui.h>
 
 #include <QObject>
+#include <QMetaType>
 
 namespace lens
 {
@@ -33,5 +34,7 @@ namespace lens
 	virtual IplImage* getFrame(void)  = 0;
   };
 }
+
+Q_DECLARE_METATYPE(lens::ICamera*)
 
 #endif	// _LENS_CAMERA_H_
